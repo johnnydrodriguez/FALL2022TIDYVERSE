@@ -10,3 +10,6 @@ Initial Description and Link:
 Revision/Addition Description and Link:
 * Modified ggplot/forcats example to demonstrate sorting, other category
 * https://github.com/acatlin/FALL2022TIDYVERSE/blob/main/ggplot_forcats.rmd
+
+Initial Description and Link: 
+* Demonstrates how to build density plots and place them side by side

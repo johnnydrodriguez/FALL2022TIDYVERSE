@@ -1,0 +1,138 @@
+---
+title: "Density Curve Vignette"
+author: "Johnny Rodriguez"
+date: "2022-10-31"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,  warning = FALSE, message = FALSE)
+```
+
+### Introduction - Density Curve 
+This vignette will demonstrate how to build a density curve given a 538 dataset.  We will plot two factors in the dataset and place them side by side for visual comparison.
+
+The density plot curve visually displays where the area of the curve falls for a distribution.
+
+### Load the Libraries
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+library(gridExtra)
+```
+
+### Read the 538 CSV - New Voter Registrations by Jurisdiction
+
+This dataset contains new voter registrations for the 2016 and 2020 elections
+
+```{r}
+
+mydata <- read.csv("https://raw.githubusercontent.com/fivethirtyeight/data/master/voter-registration/new-voter-registrations.csv", na.strings=c("","NA"))
+
+```
+
+### Step 1 - Filter the data for the data needed for analysis
+The data will be filtered for new voter registrations in 2016.  This data can also be filtered by jurisdiction and month.
+
+
+```{r}
+
+#Filters for new voter registrations in 2016
+new2016voters <- mydata %>% 
+  filter(Year == "2016")
+
+head(new2016voters)
+
+```
+
+### Step 2 - Calculate mean and standard deviation
+Calculate the data mean and standard deviation using sd and mean functions
+
+```{r}
+
+#Calculate mean
+mean2016newvoters <- mean(new2016voters$New.registered.voters) %>% 
+  print()
+
+#Calculate the standard deviation
+sd2016newvoters <- sd(new2016voters$New.registered.voters) %>% 
+  print()
+
+```
+
+### Step 3 - Create the density plot
+Given the mean and standard deviation of the distribution, create the density plot with ggplot.  The plot is further enhanced by marking the means and standard deviation values.
+
+```{r}
+
+#Create the histogram and density curve
+new2016 <- ggplot(new2016voters, aes(x = New.registered.voters)) +
+  geom_blank() +
+  
+  #Creates the histogram for this distribution
+  geom_histogram(aes(y = ..density..), color = "#000000", fill = "#0099F8", binwidth = 10000) +
+  
+  #Calculates the density curve for the distribution
+  stat_function(fun = dnorm, args = c(mean = mean2016newvoters,sd = sd2016newvoters), col = "tomato")+
+  
+  #Add labels to part of the density plot
+  ggtitle("New Registered Voters in 2016")+
+  labs(y = "Density", x = "2016 New Registered Voters")+
+  geom_vline(aes(xintercept = mean2016newvoters), color = "#000000", size = 1) +
+  geom_vline(aes(xintercept = mean2016newvoters + sd2016newvoters), color = "#000000", size = .75, linetype = "dashed") +
+  geom_vline(aes(xintercept = mean2016newvoters - sd2016newvoters), color = "#000000", size = .75, linetype = "dashed")
+  
+new2016
+
+```
+
+### Step 4 - Repeat the process for the comparison plot
+We will repeat the same procedure to generate the density plot for New Registered Voters in 2020.  All calculations are performed in one chunk.
+
+```{r}
+
+#Filters for new voter registrations in 2020
+new2020voters <- mydata %>% 
+  filter(Year == "2020") 
+
+#Calculate mean
+mean2020newvoters <- mean(new2020voters$New.registered.voters) 
+
+#Calculate the standard deviation
+sd2020newvoters <- sd(new2020voters$New.registered.voters) 
+
+#Create the histogram and density curve
+new2020 <- ggplot(new2020voters, aes(x = New.registered.voters)) +
+  geom_blank() +
+  
+  #Creates the histogram for this distribution
+  geom_histogram(aes(y = ..density..), color = "#000000", fill = "#0099F8", binwidth = 10000) +
+  
+  #Calculates the density curve for the distribution
+  stat_function(fun = dnorm, args = c(mean = mean2020newvoters,sd = sd2020newvoters), col = "tomato")+
+  
+  #Add labels to part of the density plot
+  ggtitle("New Registered Voters in 2020")+
+  labs(y = "Density", x = "2020 New Registered Voters")+
+  geom_vline(aes(xintercept = mean2020newvoters), color = "#000000", size = 1) +
+  geom_vline(aes(xintercept = mean2020newvoters + sd2020newvoters), color = "#000000", size = .75, linetype = "dashed") +
+  geom_vline(aes(xintercept = mean2020newvoters - sd2020newvoters), color = "#000000", size = .75, linetype = "dashed")
+  
+new2020
+
+```
+
+### Step 5 - Use Grid Extra Package to place them side by side.
+This allows for a visual inspection of both election periods.
+
+```{r}
+
+#Side by side grids
+grid.arrange(new2016, new2020, ncol = 2)
+
+
+```
+
+
+
